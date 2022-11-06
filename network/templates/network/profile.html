@@ -1,0 +1,14 @@
+{% extends "network/layout.html" %}
+{% load static %}
+{% block body %}
+    <div id="profile">
+        <h1>{{name}}</h1>
+        <div id="background">
+            <img src="{% static 'network/default.png' %}" alt="...">
+        </div>
+        
+    </div>
+{% endblock %}
+{% block script %}
+<script src="{% static 'network/follow.js' %}"></script>
+{% endblock %}

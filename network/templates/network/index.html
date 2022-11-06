@@ -1,0 +1,83 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block body %}
+    <div class="col">
+        <h1>All Posts</h1>
+    </div>
+    {% if user.is_authenticated %}
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                    <form id="post-form">
+                        <div class="">
+                            <textarea autofocus name="content" id="post-content" class="form-control" placeholder="What's on your mind?"></textarea>
+                        </div>
+                    <button class="btn btn-primary" id="button-post"> Post </button>
+            </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+   <div id="feed">
+      {% for post in page_obj %}
+      <div class="col">
+        <div class="card" id="card-posts">
+          <div class="card-body">
+ 
+            <h5 class="card-title bold">
+              <strong>{{ post.user }}</strong>
+            </h5>
+            <p class="card-text" id="content{{ post.id }}">{{ post.content }}</p>
+            <p class="card-text text-muted">{{ post.timestamp }}</p>
+            {% if post.user == user %}
+              <input id="edit-button" type="image" src="{% static 'network/index.png' %}" alt="..." onclick="edit('{{ post.id }}')">
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+   </div>
+   <div id="next">
+    
+    <nav aria-label="page-nav">
+        <ul class="pagination justify-content-center">
+
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}" tabindex="-1" aria-disabled="true">Previous</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+            </li>
+          {% endif %}
+          {% for i in page_obj.paginator.page_range %}
+            {% if page_obj.number == i %}
+              <li class="page-item active" aria-current="page">
+                <a class="page-link" href="#">{{ i }} <span class="sr-only">(current)</span></a>
+              </li>
+            {% else %}
+              <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+          {% endfor %}
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <a class="page-link" href="#">Next</a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+   </div>
+{% endblock %}
+{% block scripts %}
+        <script src="{% static 'network/post.js' %}"></script>
+        <script src="{% static 'network/edit.js' %}"></script>
+        <script src="{% static 'network/like.js' %}"></script>
+        <script src="{% static 'network/test.js' %}"></script>
+
+{% endblock %}

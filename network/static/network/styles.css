@@ -1,0 +1,38 @@
+#button-post {
+    margin-top: 15px;
+}
+#profile {
+    text-align: center;
+    
+}
+#background {
+    background-color: #f07878;
+    padding: 20px;
+    border-radius: 5px;
+    margin-top: 20px;
+    width: 50%;
+    float: none;
+    margin: 0 auto;
+
+}
+.body {
+
+}
+#edit-button {
+    width: 45px;
+    height: 45px;
+    float: right;
+}
+.card {
+    /* adding features to bootstrap card */
+    width: 50%;
+    margin: 0 auto; 
+    float: none; 
+    margin-bottom: 25px; 
+    -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+    box-shadow: 0 6px 12px rgba(0,0,0,.175);
+    -moz-tox-shadow: 0 6px 12px rgba(0,0,0,.175);
+}
+.card:hover {
+    
+}
