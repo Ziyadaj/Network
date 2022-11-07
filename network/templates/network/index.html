@@ -21,21 +21,49 @@
     {% endif %}
    <div id="feed">
       {% for post in page_obj %}
-      <div class="col">
-        <div class="card" id="card-posts">
-          <div class="card-body">
- 
-            <h5 class="card-title bold">
-              <strong>{{ post.user }}</strong>
-            </h5>
-            <p class="card-text" id="content{{ post.id }}">{{ post.content }}</p>
-            <p class="card-text text-muted">{{ post.timestamp }}</p>
-            {% if post.user == user %}
+        <div class="col">
+          <div class="card" id="card-posts">
+            <div class="card-body">
+              {% if post.user == user %}
               <input id="edit-button" type="image" src="{% static 'network/index.png' %}" alt="..." onclick="edit('{{ post.id }}')">
-            {% endif %}
+              {% endif %}
+              <h5 class="card-title">
+                <a style="color: black;" href="{% url 'profile' post.user %}">
+                  <strong>{{ post.user }}</strong>
+                </a>  
+              </h5>
+              <p class="card-text" id="content{{ post.id }}">{{ post.content }}</p>
+              <p class="card-text text-muted">{{ post.timestamp }}</p>
+              <div class="row">
+                <div class="col-2">
+                  <a class="text-muted" href="#" onclick="comment('{{ post.id }}')"> Comment </a>
+                </div>
+                <div class="col-3" id="like{{post.id}}">
+                    {% if post.user in post.likes.all %}
+                      <input type="image" src="{% static 'network/heart.png' %}" id="button-like" onclick="like('{{ post.id }}','{{post.likes.count}}',true)" alt="...">
+                      <span id="like-count">{{post.likes.count}}</span>
+                    {% else %}
+                      <input type="image" src="{% static 'network/heart-empty.png' %}" id="like-button{{post.id}}" onclick="like('{{ post.id }}','{{post.likes.count}}',false)" alt="...">
+                      <span id="like-count">{{post.likes.count}}</span>
+                    {% endif %}
+                  </div>
+                </div>
+            </div>
           </div>
         </div>
-      </div>
+      {% if post.comment %}
+        <div class="col">
+          <div class="card" id="card-comments">
+            <div class="card-body">
+              <h5 class="card-title">
+                <strong>{{ post.comment.user }}</strong>
+              </h5>
+              <p class="card-text">{{ post.comment.content }}</p>
+              <p class="card-text text-muted">{{ post.comment.timestamp }}</p>
+            </div>
+          </div>
+        </div>
+      {% endif %}
       {% endfor %}
    </div>
    <div id="next">

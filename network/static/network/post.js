@@ -21,3 +21,17 @@ function post() {
     }
     );
 }
+function comment(id) {
+    event.preventDefault();
+    fetch(`/comment/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            comments: document.querySelector(`#comment${id}`).value
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        console.log(result);
+    }
+    );
+}
