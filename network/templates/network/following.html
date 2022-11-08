@@ -1,7 +1,7 @@
 {% extends "network/layout.html" %}
 {% load static %}
 {% block body %}
-{% if empty %}
+{% if page_obj is None %}
 <div class="card" id="no-follow">
     <h1>Nothing to see here!</h1>
     <p class="text-muted">Follow some users to see their posts here.</p>
@@ -12,10 +12,11 @@
     <div class="col">
       <div class="card" id="card-posts">
         <div class="card-body">
-
-          <h5 class="card-title bold">
-            <strong>{{ post.user }}</strong>
-          </h5>
+        <h5 class="card-title">
+            <a style="color: black;" href="{% url 'profile' post.user %}">
+                <strong>{{ post.user }}</strong>
+            </a>  
+            </h5>
           <p class="card-text" id="content{{ post.id }}">{{ post.content }}</p>
           <p class="card-text text-muted">{{ post.timestamp }}</p>
           {% if post.user == user %}
@@ -26,41 +27,7 @@
     </div>
     {% endfor %}
  </div>
- <div id="next">
-    <nav aria-label="page-nav">
-        <ul class="pagination justify-content-center">
-
-          {% if page_obj.has_previous %}
-            <li class="page-item">
-              <a class="page-link" href="?page={{ page_obj.previous_page_number }}" tabindex="-1" aria-disabled="true">Previous</a>
-            </li>
-          {% else %}
-            <li class="page-item disabled">
-              <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-            </li>
-          {% endif %}
-          {% for i in page_obj.paginator.page_range %}
-            {% if page_obj.number == i %}
-              <li class="page-item active" aria-current="page">
-                <a class="page-link" href="#">{{ i }} <span class="sr-only">(current)</span></a>
-              </li>
-            {% else %}
-              <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
-            {% endif %}
-          {% endfor %}
-          {% if page_obj.has_next %}
-            <li class="page-item">
-              <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
-            </li>
-          {% else %}
-            <li class="page-item disabled">
-              <a class="page-link" href="#">Next</a>
-            </li>
-          {% endif %}
-        </ul>
-      </nav>
-   </div>
-{% endif %}
+ {% endif %}
 {% endblock %}
 {% block script %}
 <script src="{% static 'network/follow.js' %}"></script>

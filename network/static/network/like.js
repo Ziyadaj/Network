@@ -20,8 +20,9 @@ function like(id, like, dislike) {
             }
             else {
             // if the post has more than 0 likes, keep the heart
+            
             document.querySelector(`#like${id}`).innerHTML = 
-            `<input type="image" src="static/network/heart.png" id="button-like" onclick="like(${id},${like},${false})" alt="...">
+            `<input type="image" src="static/network/heart-empty.png" id="button-like" onclick="like(${id},${like},${false})" alt="...">
             <span id="like-count">${int}</span>`;
             }
         }

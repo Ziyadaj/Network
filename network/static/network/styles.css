@@ -1,6 +1,41 @@
 a:hover {
     text-decoration: none;
 }
+.dark-mode {
+    background-color: rgb(43, 42, 51);
+    color: #fff;
+}
+button.link { 
+    background:none; 
+    border:none; 
+    outline: none;
+}
+.card-footer {
+    background-color: inherit;
+    text-align: center;
+} 
+.content {
+    overflow:hidden;
+    margin-bottom: 20px;
+    font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
+    Font-size: 18px;
+}
+.fodder-content {
+    display: none;
+}
+.card-header {
+    height: 125px;
+}
+#comments {
+    font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
+    Font-size: 18px;
+}
+#button-comment {
+    margin-top: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    float: right;
+}
 #no-follow {
     margin: 0 auto; 
     float: none; 
@@ -25,6 +60,13 @@ a:hover {
     padding-left: 50px;
     padding-right: 50px;
 }
+#button-unfollow {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    padding-left: 40px;
+    padding-right: 40px;
+}
 #profile-pic {
     display: flex;
     align-items: flex-end;
@@ -39,8 +81,7 @@ a:hover {
 #follow-card {
     padding: 30px;
 }
-.body {
-
+body {
 }
 #edit-button {
     width: 45px;

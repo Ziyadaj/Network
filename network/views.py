@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-from .models import User, Post
+from .models import User, Post, Follow, Comment
 
 # all posts
 def index(request):
@@ -16,10 +16,18 @@ def index(request):
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-
+    user = request.user
+    comments = Comment.objects.all().order_by('-timestamp')
+    content = []
+    for post in posts:
+        content.append(post.content)
     return render(request, "network/index.html", {
-        "page_obj": page_obj
+        "page_obj": page_obj,
+        "user": user,
+        "comments": comments,
+        "content": content
     })
+
 
 # New Post
 @csrf_exempt
@@ -34,12 +42,6 @@ def form(request):
         post.save()
         return JsonResponse({"message": "Post created successfully."}, status=201)
     return JsonResponse({"error": "Post content required."}, status=400)
-# # a single post  
-# def post(request, post_id):
-#     post = Post.objects.get(id=post_id)
-#     return render(request, "network/index.html", {
-#         "post": post
-#     })
     
 # profile page
 def profile(request, user_name):
@@ -53,7 +55,8 @@ def profile(request, user_name):
     following = profile.following.all().count()
     if not user.is_anonymous:
         followed = False
-        if user.id in profile.followers.all():
+        follow_obj = Follow.objects.filter(user=user, follower=profile)
+        if follow_obj.exists():
             followed = True
         return render(request, "network/profile.html", {
             "user": user,
@@ -79,50 +82,45 @@ def profile(request, user_name):
 @login_required(login_url='/login')    
 def following(request):
     user = request.user
-    following = user.following.all().values_list('user_id')
-    posts = Post.objects.filter(user__in=following).order_by('-timestamp')
-    empty = False
-    if posts.count() == 0:
-        empty = True
-    paginator = Paginator(posts, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    follow_obj = Follow.objects.filter(user=user)
+    if follow_obj.exists():
+        following = []
+        for follow in follow_obj:
+            following.append(follow.follower)
+        posts = Post.objects.filter(user__in=following).order_by('-timestamp')
+        paginator = Paginator(posts, 10)
+        page_obj = paginator.get_page(1)
+        # latest ten posts
+        return render(request, "network/following.html", {
+            "page_obj": page_obj
+        })
     return render(request, "network/following.html", {
-        "page_obj": page_obj,
-        "empty": empty
+        "page_obj": None
     })
 
 # add a follower
 @csrf_exempt
 def add_following(request, user_id):
-    if request.method != "PUT":
-        return JsonResponse({"error": "PUT request required."}, status=400)
+    if request.method != "POST":
+        return JsonResponse({"error": "POST request required."}, status=400)
     user = request.user
-    profile_user = User.objects.get(id=user_id)
-    p = Post.objects.get(id=profile_user.id)
-    print(p.followers)
+    profile = User.objects.get(id=user_id)
     if user_id == user.id:
         return JsonResponse({"error": "Cannot follow yourself."}, status=400)
-    if user not in profile_user.followers.all():
-        print(user)
-        print(profile_user)
+    
+    follow_obj = Follow.objects.filter(user=user, follower=profile)
+
+    ## if user is not following profile
+    if not follow_obj.exists():
         # add user to following
-        user.following.add(user_id)        
-        user.save()
-        # add follower to profile
-        profile_user.followers.add(user.id)
-        profile_user.save()
+        follow = Follow(user=user, follower=profile)
+        follow.save()
         return JsonResponse({"message": "Follow successful."}, status=201)
     else:
         # remove user from following
-        print("removing")
-        user.following.remove(user_id)
-        user.save()
-        # remove follower from profile
-        profile_user.followers.remove(user.id)
-        profile_user.save()
+        follow_obj.delete()
         return JsonResponse({"message": "Unfollow successful."}, status=201)
-    
+
 # edit a post
 @csrf_exempt
 def edit(request, post_id):
@@ -158,8 +156,8 @@ def comment(request, post_id):
     data = json.loads(request.body)
     if data.get("comments") is not None:
         post = Post.objects.get(id=post_id)
-        post.comments = data["content"]
-        post.save()
+        comment = Comment(user=request.user, post=post, content=data["comments"])
+        comment.save()
         return JsonResponse({"message": "Comment created successfully."}, status=201)
     return JsonResponse({"error": "Comment content required."}, status=400)
 

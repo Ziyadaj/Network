@@ -3,7 +3,7 @@
 
 {% block body %}
     <div class="col">
-        <h1>All Posts</h1>
+        <h1>Home</h1>
     </div>
     {% if user.is_authenticated %}
     <div class="col">
@@ -19,6 +19,7 @@
         </div>
     </div>
     {% endif %}
+    
    <div id="feed">
       {% for post in page_obj %}
         <div class="col">
@@ -32,14 +33,24 @@
                   <strong>{{ post.user }}</strong>
                 </a>  
               </h5>
+              <p class="card-text text-muted"> {{ post.timestamp }} </p>
+              {% if post.content|length > 280 %}
+              <div class="content">
+                <p class="card-text" id="content{{ post.id }}">{{ post.content|truncatechars:280 }}</p>
+              </div>
+              <p class="fodder-content" id="uncontent{{ post.id }}">{{ post.content }}</p>
+              <div class="card-footer">
+                <button id="show-more{{post.id}}" class="link text-muted" onclick="showMore('{{post.id}}')"> Show more </a>
+              </div>
+              {% else %}
               <p class="card-text" id="content{{ post.id }}">{{ post.content }}</p>
-              <p class="card-text text-muted">{{ post.timestamp }}</p>
+              {% endif %}
               <div class="row">
                 <div class="col-2">
-                  <a class="text-muted" href="#" onclick="comment('{{ post.id }}')"> Comment </a>
+                  <button class="link text-muted" onclick="comment('{{post.id}}')"> Comments </a>
                 </div>
                 <div class="col-3" id="like{{post.id}}">
-                    {% if post.user in post.likes.all %}
+                    {% if user in post.likes.all %}
                       <input type="image" src="{% static 'network/heart.png' %}" id="button-like" onclick="like('{{ post.id }}','{{post.likes.count}}',true)" alt="...">
                       <span id="like-count">{{post.likes.count}}</span>
                     {% else %}
@@ -47,65 +58,75 @@
                       <span id="like-count">{{post.likes.count}}</span>
                     {% endif %}
                   </div>
+              </div>
+            </div>
+          </div>
+        </div>          
+        <div style="display: none;" class="card" id="comments{{post.id}}">
+          {% if user.is_authenticated %}
+          <form action="">
+            <div class="card-header">
+              <textarea name="content" id="comment-content{{post.id}}" class="form-control" placeholder="Write a comment..."></textarea>
+              <button class="btn btn-dark" id="button-comment" onclick="submitComment('{{post.id}}')"> Comment </button>
+            </div>
+          </form> 
+          {% endif %}
+          <div class="card-body" id="comment{{ post.id }}">
+            {% for comment in comments %}
+              {% if comment.post == post %}
+                <div id="comments" class="row">
+                  <div class="col-2">
+                    <a style="color: black;" href="{% url 'profile' comment.user %}">
+                      <strong>{{ comment.user }}</strong>
+                    </a>
+                  </div>
+                  <div class="col-10">
+                    <p class="card-text" id="comment-content">{{ comment.content }}</p>
+                  </div>
                 </div>
-            </div>
-          </div>
+              {% endif %}
+            {% endfor %}
         </div>
-      {% if post.comment %}
-        <div class="col">
-          <div class="card" id="card-comments">
-            <div class="card-body">
-              <h5 class="card-title">
-                <strong>{{ post.comment.user }}</strong>
-              </h5>
-              <p class="card-text">{{ post.comment.content }}</p>
-              <p class="card-text text-muted">{{ post.comment.timestamp }}</p>
-            </div>
-          </div>
-        </div>
-      {% endif %}
+      </div>
       {% endfor %}
    </div>
-   <div id="next">
-    
-    <nav aria-label="page-nav">
-        <ul class="pagination justify-content-center">
+<div id="next">  
+  <nav aria-label="page-nav">
+      <ul class="pagination justify-content-center">
 
-          {% if page_obj.has_previous %}
-            <li class="page-item">
-              <a class="page-link" href="?page={{ page_obj.previous_page_number }}" tabindex="-1" aria-disabled="true">Previous</a>
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" tabindex="-1" aria-disabled="true">Previous</a>
+          </li>
+        {% else %}
+          <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+          </li>
+        {% endif %}
+        {% for i in page_obj.paginator.page_range %}
+          {% if page_obj.number == i %}
+            <li class="page-item active" aria-current="page">
+              <a class="page-link" href="#">{{ i }} <span class="sr-only">(current)</span></a>
             </li>
           {% else %}
-            <li class="page-item disabled">
-              <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-            </li>
+            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
           {% endif %}
-          {% for i in page_obj.paginator.page_range %}
-            {% if page_obj.number == i %}
-              <li class="page-item active" aria-current="page">
-                <a class="page-link" href="#">{{ i }} <span class="sr-only">(current)</span></a>
-              </li>
-            {% else %}
-              <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
-            {% endif %}
-          {% endfor %}
-          {% if page_obj.has_next %}
-            <li class="page-item">
-              <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
-            </li>
-          {% else %}
-            <li class="page-item disabled">
-              <a class="page-link" href="#">Next</a>
-            </li>
-          {% endif %}
-        </ul>
-      </nav>
-   </div>
+        {% endfor %}
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+          </li>
+        {% else %}
+          <li class="page-item disabled">
+            <a class="page-link" href="#">Next</a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+</div>
 {% endblock %}
 {% block scripts %}
         <script src="{% static 'network/post.js' %}"></script>
         <script src="{% static 'network/edit.js' %}"></script>
         <script src="{% static 'network/like.js' %}"></script>
-        <script src="{% static 'network/test.js' %}"></script>
-
 {% endblock %}

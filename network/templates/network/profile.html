@@ -10,14 +10,17 @@
             {% if not followed and not anonymous %}
               <button id="button-follow" class="btn btn-dark" onclick="follow('{{profile.id}}')">Follow</button>
             {% endif %}
+            {% if followed and not anonymous %}
+              <button id="button-unfollow" class="btn btn-dark" onclick="follow('{{profile.id}}')">Unfollow</button>
+            {% endif %}
             <div id="follow-card" class="card">
               <div class="row">
-                <div class="col">
-                  <p>Followers: {{followers}}</p>
+                <div id="followers" class="col">
+                  <p>{{followers}} Followers</p>
 
                 </div>
-                <div class="col">
-                  <p>Following: {{following}}</p>
+                <div id="following" class="col">
+                  <p>{{following}} Following</p>
 
                 </div>
               </div>

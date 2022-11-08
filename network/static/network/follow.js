@@ -1,7 +1,6 @@
-
 function follow(id) {
     fetch(`/follow/${id}`, {
-        method: 'PUT',
+        method: 'POST',
         body: JSON.stringify({
             id: id
         })
@@ -9,14 +8,18 @@ function follow(id) {
     .then(response => response.json())
     .then(result => {
         console.log(result);
-        // if (result.message === 'Followed') {
-        //     document.querySelector(`#follow${id}`).innerHTML = 
-        //     `<button class="btn btn-primary" onclick="follow(${id})">Unfollow</button>`;
-        // }
-        // else {
-        //     document.querySelector(`#follow${id}`).innerHTML = 
-        //     `<button class="btn btn-primary" onclick="follow(${id})">Follow</button>`;
-        // }
-    }
-    );
+        
+        if (result.message === 'Follow successful.') {
+            let button = document.querySelector('#button-follow');
+            button.textContent = 'Unfollow';
+        }
+        else if (result.message === 'Unfollow successful.') {
+            let button = document.querySelector('#button-unfollow');
+            button.textContent = 'Follow';
+        }
+        else if (result.error === 'Cannot follow yourself.') {
+            alert('You cannot follow yourself.');
+        }
+        
+    });
 }
