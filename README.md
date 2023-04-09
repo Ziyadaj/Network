@@ -26,14 +26,6 @@ JavaScript
 HTML
 CSS
 
-## Installation
-
-To install and run the application, follow these steps:
-
-Clone the repository: git clone https://github.com/ziyadaj/network.git
-Navigate to the project directory: cd network
-Install the required packages: pip install -r requirements.txt
-Run the application: python manage.py runserver
 
 ## Credits
 
